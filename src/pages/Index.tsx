@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ import { DashboardStats } from "@/components/DashboardStats";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { signOut } = useAuth();
 
   const mockAccounts = [
     {
@@ -76,9 +78,14 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">Content Automation</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={signOut}
+            >
               <Settings className="w-4 h-4" />
-              Settings
+              Sign Out
             </Button>
           </div>
         </div>
@@ -206,24 +213,6 @@ const Index = () => {
         {activeTab === "schedule" && <ScheduleView />}
       </main>
 
-      {/* Backend Notice */}
-      <div className="fixed bottom-4 right-4 max-w-sm">
-        <Card className="bg-gradient-secondary shadow-elevated border-accent/20">
-          <CardContent className="p-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-white text-sm">Backend Features Coming</h4>
-                <p className="text-white/80 text-xs mt-1">
-                  Connect to Supabase to enable content generation, social media posting, and scheduled automation.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
