@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAccounts } from "@/hooks/useAccounts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,46 +23,13 @@ import { AccountCard } from "@/components/AccountCard";
 import { ContentPreview } from "@/components/ContentPreview";
 import { ScheduleView } from "@/components/ScheduleView";
 import { DashboardStats } from "@/components/DashboardStats";
+import InstagramConnect from "@/components/InstagramConnect";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { signOut } = useAuth();
+  const { accounts, loading: accountsLoading } = useAccounts();
 
-  const mockAccounts = [
-    {
-      id: "1",
-      platform: "instagram",
-      username: "@fitnessjourney",
-      genre: "Fitness & Health",
-      followers: "12.5K",
-      isActive: true,
-      nextPost: "2 hours",
-      icon: Instagram,
-      color: "instagram"
-    },
-    {
-      id: "2", 
-      platform: "twitter",
-      username: "@techinsights",
-      genre: "Technology",
-      followers: "8.2K",
-      isActive: true,
-      nextPost: "45 mins",
-      icon: Twitter,
-      color: "twitter"
-    },
-    {
-      id: "3",
-      platform: "linkedin",
-      username: "Business Growth",
-      genre: "Business",
-      followers: "5.8K", 
-      isActive: false,
-      nextPost: "Paused",
-      icon: Linkedin,
-      color: "linkedin"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,17 +163,49 @@ const Index = () => {
                 <h2 className="text-2xl font-bold text-foreground">Connected Accounts</h2>
                 <p className="text-muted-foreground">Manage your social media accounts and automation settings</p>
               </div>
-              <Button className="bg-gradient-primary hover:opacity-90 gap-2">
-                <Plus className="w-4 h-4" />
-                Add Account
-              </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockAccounts.map((account) => (
-                <AccountCard key={account.id} account={account} />
-              ))}
-            </div>
+            {accountsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <span className="text-muted-foreground">Loading accounts...</span>
+                </div>
+              </div>
+            ) : accounts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {accounts.map((account) => (
+                  <AccountCard 
+                    key={account.id} 
+                    account={{
+                      id: account.id,
+                      platform: account.platform,
+                      username: account.username,
+                      genre: account.display_name || "Social Media",
+                      followers: account.follower_count.toLocaleString(),
+                      isActive: account.is_active,
+                      nextPost: account.is_active ? "Scheduled" : "Paused",
+                      icon: account.platform === 'instagram' ? Instagram : 
+                            account.platform === 'twitter' ? Twitter :
+                            account.platform === 'facebook' ? Facebook :
+                            account.platform === 'linkedin' ? Linkedin : Instagram,
+                      color: account.platform as any
+                    }} 
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-2xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
+                  <Plus className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No Accounts Connected</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Connect your social media accounts to start automating your content and growing your audience.
+                </p>
+                <InstagramConnect />
+              </div>
+            )}
           </div>
         )}
 
